@@ -2,15 +2,15 @@ version: '3.8'
 
 services:
   bullriding:
-    image: your-dockerhub-username/bullriding_2024:latest
+    image: swisi/bullriding_2024:latest
     ports:
       - "5000:5000"
     environment:
       - FLASK_APP=app
       - FLASK_ENV=production
-      - DATABASE_URL=sqlite:///app/instance/site.db  # SQLite-Datenbank-URL
+      - DATABASE_URL=sqlite:///app/database/site.db  # SQLite-Datenbank-URL
     volumes:
-      - db-data:/app/db
+      - db-data:/app/database
     restart: always
 
 volumes:

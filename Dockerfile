@@ -11,6 +11,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Kopieren Sie den Rest des Anwendungscodes
 COPY . .
 
+# Erstellen Sie das Verzeichnis für die Datenbank, falls es nicht existiert
+RUN mkdir -p /app/database
+
 # Setzen Sie die Flask-Umgebungsvariablen
 ENV FLASK_APP=app
 ENV FLASK_ENV=production
