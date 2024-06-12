@@ -1,39 +1,78 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="row">
-    <div class="col-md-6 offset-md-3">
+    <div class="col-md-8 offset-md-2">
       <h2>Add Participant</h2>
       <form method="POST" action="">
         {{ form.hidden_tag() }}
-        <div class="form-group">
-          {{ form.first_name.label }}
-          {{ form.first_name(class="form-control") }}
+
+        <div class="container mt-4">
+          <h4>Address and Contact Information</h4>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>{{ form.start_nr.label }}</td>
+                <td colspan="3">{{ form.start_nr(class="form-control") }}</td>
+              </tr>
+              <tr>
+                <td>{{ form.first_name.label }}</td>
+                <td>{{ form.first_name(class="form-control") }}</td>
+                <td>{{ form.last_name.label }}</td>
+                <td>{{ form.last_name(class="form-control") }}</td>
+              </tr>
+              <tr>
+                <td>{{ form.address.label }}</td>
+                <td colspan="3">{{ form.address(class="form-control") }}</td>
+              </tr>
+              <tr>
+                <td>{{ form.postal_code.label }}</td>
+                <td>{{ form.postal_code(class="form-control") }}</td>
+                <td>{{ form.city.label }}</td>
+                <td>{{ form.city(class="form-control") }}</td>
+              </tr>
+              <tr>
+                <td>{{ form.email.label }}</td>
+                <td>{{ form.email(class="form-control") }}</td>
+                <td>{{ form.phone.label }}</td>
+                <td>{{ form.phone(class="form-control") }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="form-group">
-          {{ form.last_name.label }}
-          {{ form.last_name(class="form-control") }}
+
+        <div class="container mt-4">
+          <h4>Times</h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ form.time1.label }}</th>
+                <th>{{ form.time2.label }}</th>
+                <th>{{ form.time3.label }}</th>
+                <th>{{ form.time4.label }}</th>
+                <th>{{ form.time5.label }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ form.time1(class="form-control") }}</td>
+                <td>{{ form.time2(class="form-control") }}</td>
+                <td>{{ form.time3(class="form-control") }}</td>
+                <td>{{ form.time4(class="form-control") }}</td>
+                <td>{{ form.time5(class="form-control") }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="form-group">
-          {{ form.address.label }}
-          {{ form.address(class="form-control") }}
+
+        <div class="container mt-4">
+          <h4>Shortest Time</h4>
+          <div class="form-group">
+            {{ form.shortest_time.label }}
+            {{ form.shortest_time(class="form-control") }}
+          </div>
         </div>
-        <div class="form-group">
-          {{ form.postal_code.label }}
-          {{ form.postal_code(class="form-control") }}
-        </div>
-        <div class="form-group">
-          {{ form.city.label }}
-          {{ form.city(class="form-control") }}
-        </div>
-        <div class="form-group">
-          {{ form.email.label }}
-          {{ form.email(class="form-control") }}
-        </div>
-        <div class="form-group">
-          {{ form.phone.label }}
-          {{ form.phone(class="form-control") }}
-        </div>
-        <div class="form-group">
+
+        <div class="form-group mt-4">
           {{ form.submit(class="btn btn-primary") }}
         </div>
       </form>

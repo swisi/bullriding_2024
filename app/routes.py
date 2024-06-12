@@ -51,32 +51,32 @@ def register():
 @login_required
 def participant():
     form = ParticipantForm()
+
     if form.validate_on_submit():
-        participant = Participant(
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            address=form.address.data,
-            postal_code=form.postal_code.data,
-            city=form.city.data,
-            email=form.email.data,
-            phone=form.phone.data
-        )
+        participant = Participant()
+        form.update_data(participant)
         db.session.add(participant)
         db.session.commit()
         flash('Participant added successfully!')
         return redirect(url_for('main.index'))
+    else:
+        print("Form validation failed")
     return render_template('participant.html', title='Add Participant', form=form)
 
-@bp.route('/participant/<int:id>/edit', methods=['GET', 'POST'])
+@bp.route('/participant_edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def participant_edit(id):
     participant = Participant.query.get_or_404(id)
-    form = ParticipantForm()
+    form = ParticipantForm(obj=participant)
+
     if form.validate_on_submit():
         form.update_data(participant)
         db.session.commit()
         flash('Participant updated successfully!')
         return redirect(url_for('main.index'))
-    elif request.method == 'GET':
-        form.load_data(participant)
-    return render_template('participant_edit.html', title='Edit Participant', form=form, participant=participant)
+    else:
+        print("Form validation failed")
+
+    form.load_data(participant)
+    form.shortest_time.data = participant.shortest_time
+    return render_template('participant_edit.html', title='Edit Participant', form=form)
