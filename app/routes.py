@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from app import db
 from app.models import User, Participant
-from app.forms import LoginForm, RegistrationForm, ParticipantForm, TimeEntryForm
+from app.forms import LoginForm, RegistrationForm, ParticipantForm  # Entfernen Sie TimeEntryForm
 
 bp = Blueprint('main', __name__)
 
@@ -12,8 +12,7 @@ bp = Blueprint('main', __name__)
 @login_required
 def index():
     participants = Participant.query.all() if current_user.is_authenticated else []
-    form = TimeEntryForm()
-    return render_template('index.html', title='Home', participants=participants, form=form)
+    return render_template('index.html', title='Home', participants=participants)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -79,25 +78,16 @@ def participant_edit(id):
     form.shortest_time.data = participant.shortest_time
     return render_template('participant_edit.html', title='Edit Participant', form=form)
 
-@bp.route('/add_time', methods=['POST'])
+@bp.route('/update_times/<int:id>', methods=['POST'])
 @login_required
-def add_time():
-    form = TimeEntryForm()
-    if form.validate_on_submit():
-        rider = form.rider.data
-        new_time = form.time.data
-        participant = Participant.query.filter_by(start_nr=rider).first()
-
-        if participant:
-            # Update existing participant
-            times = [participant.time1, participant.time2, participant.time3, participant.time4, participant.time5]
-            for i in range(len(times)):
-                if times[i] is None:
-                    times[i] = new_time
-                    break
-            participant.time1, participant.time2, participant.time3, participant.time4, participant.time5 = times
-            db.session.commit()
-            flash('Time entry added successfully!')
-        else:
-            flash('Participant not found')
+def update_times(id):
+    participant = Participant.query.get_or_404(id)
+    participant.time1 = request.form.get('time1', type=float)
+    participant.time2 = request.form.get('time2', type=float)
+    participant.time3 = request.form.get('time3', type=float)
+    participant.time4 = request.form.get('time4', type=float)
+    participant.time5 = request.form.get('time5', type=float)
+    
+    db.session.commit()
+    flash('Times updated successfully!')
     return redirect(url_for('main.index'))

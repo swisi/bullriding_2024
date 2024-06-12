@@ -37,6 +37,6 @@ class Participant(db.Model):
     time5 = db.Column(db.Float, nullable=True)
 
     @property
-    def shortest_time(self):
+    def longest_time(self):
         times = [t for t in [self.time1, self.time2, self.time3, self.time4, self.time5] if t is not None]
-        return min(times) if times else None
+        return max(times) if times else None

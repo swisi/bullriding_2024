@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, HiddenField, FloatField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, HiddenField, FloatField, SelectField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from app.models import User, Participant
 
@@ -86,8 +86,3 @@ class ParticipantForm(FlaskForm):
             return float(value) if value.strip() else None
         except ValueError:
             return None
-
-class TimeEntryForm(FlaskForm):
-    rider = IntegerField('Start Number', validators=[DataRequired()])
-    time = FloatField('Time', validators=[DataRequired()])
-    submit = SubmitField('Submit')
