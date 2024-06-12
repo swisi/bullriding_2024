@@ -35,6 +35,11 @@ class ParticipantForm(FlaskForm):
     city = StringField('City', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Phone', validators=[DataRequired()])
+    time1 = StringField('Time 1', validators=[DataRequired()])
+    time2 = StringField('Time 2', validators=[DataRequired()])
+    time3 = StringField('Time 3', validators=[DataRequired()])
+    time4 = StringField('Time 4', validators=[DataRequired()])
+    time5 = StringField('Time 5', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
     def load_data(self, participant):
@@ -45,6 +50,11 @@ class ParticipantForm(FlaskForm):
         self.city.data = participant.city
         self.email.data = participant.email
         self.phone.data = participant.phone
+        self.time1.data = participant.time1
+        self.time2.data = participant.time2
+        self.time3.data = participant.time3
+        self.time4.data = participant.time4
+        self.time5.data = participant.time5
 
     def update_data(self, participant):
         participant.first_name = self.first_name.data
@@ -54,3 +64,9 @@ class ParticipantForm(FlaskForm):
         participant.city = self.city.data
         participant.email = self.email.data
         participant.phone = self.phone.data
+        participant.time1 = self.time1.data
+        participant.time2 = self.time2.data
+        participant.time3 = self.time3.data
+        participant.time4 = self.time4.data
+        participant.time5 = self.time5.data
+

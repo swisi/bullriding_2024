@@ -29,3 +29,13 @@ class Participant(db.Model):
     city = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
+    time1 = db.Column(db.Float, nullable=True)
+    time2 = db.Column(db.Float, nullable=True)
+    time3 = db.Column(db.Float, nullable=True)
+    time4 = db.Column(db.Float, nullable=True)
+    time5 = db.Column(db.Float, nullable=True)
+
+    @property
+    def shortest_time(self):
+        times = [t for t in [self.time1, self.time2, self.time3, self.time4, self.time5] if t is not None]
+        return min(times) if times else None
