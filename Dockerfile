@@ -18,5 +18,8 @@ ENV FLASK_ENV=production
 # Exponieren Sie den Port, auf dem die App läuft
 EXPOSE 5000
 
+# Initialisieren Sie die Datenbank
+RUN ["python", "init_db.py"]
+
 # Starten Sie die Flask-Anwendung
 CMD ["flask", "run", "--host=0.0.0.0"]
