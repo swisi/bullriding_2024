@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h2>Add Participant</h2>
+      <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          {{ form.first_name.label }}
+          {{ form.first_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.last_name.label }}
+          {{ form.last_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.address.label }}
+          {{ form.address(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.postal_code.label }}
+          {{ form.postal_code(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.city.label }}
+          {{ form.city(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.email.label }}
+          {{ form.email(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.phone.label }}
+          {{ form.phone(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

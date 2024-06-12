@@ -26,3 +26,13 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+
+class ParticipantForm(FlaskForm):
+    first_name = StringField('First Name', validators=[DataRequired()])
+    last_name = StringField('Last Name', validators=[DataRequired()])
+    address = StringField('Address', validators=[DataRequired()])
+    postal_code = StringField('Postal Code', validators=[DataRequired()])
+    city = StringField('City', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    phone = StringField('Phone', validators=[DataRequired()])
+    submit = SubmitField('Submit')

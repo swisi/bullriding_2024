@@ -19,3 +19,13 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+class Participant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(64), nullable=False)
+    last_name = db.Column(db.String(64), nullable=False)
+    address = db.Column(db.String(128), nullable=False)
+    postal_code = db.Column(db.String(10), nullable=False)
+    city = db.Column(db.String(64), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
