@@ -66,3 +66,17 @@ def participant():
         flash('Participant added successfully!')
         return redirect(url_for('main.index'))
     return render_template('participant.html', title='Add Participant', form=form)
+
+@bp.route('/participant/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def participant_edit(id):
+    participant = Participant.query.get_or_404(id)
+    form = ParticipantForm()
+    if form.validate_on_submit():
+        form.update_data(participant)
+        db.session.commit()
+        flash('Participant updated successfully!')
+        return redirect(url_for('main.index'))
+    elif request.method == 'GET':
+        form.load_data(participant)
+    return render_template('participant_edit.html', title='Edit Participant', form=form, participant=participant)

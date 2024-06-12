@@ -36,3 +36,21 @@ class ParticipantForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Phone', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+    def load_data(self, participant):
+        self.first_name.data = participant.first_name
+        self.last_name.data = participant.last_name
+        self.address.data = participant.address
+        self.postal_code.data = participant.postal_code
+        self.city.data = participant.city
+        self.email.data = participant.email
+        self.phone.data = participant.phone
+
+    def update_data(self, participant):
+        participant.first_name = self.first_name.data
+        participant.last_name = self.last_name.data
+        participant.address = self.address.data
+        participant.postal_code = self.postal_code.data
+        participant.city = self.city.data
+        participant.email = self.email.data
+        participant.phone = self.phone.data
