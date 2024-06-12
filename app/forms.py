@@ -4,46 +4,46 @@ from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from app.models import User, Participant
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    username = StringField('Benutzername', validators=[DataRequired()])
+    password = PasswordField('Passwort', validators=[DataRequired()])
+    remember_me = BooleanField('Angemeldet bleiben')
+    submit = SubmitField('Anmelden')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Benutzername', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Passwort', validators=[DataRequired()])
     password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
+        'Passwort wiederholen', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Registrieren')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError('Bitte einen anderen Benutzernamen verwenden.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email address.')
+            raise ValidationError('Bitte eine andere Mailadresse verwenden')
 
 class ParticipantForm(FlaskForm):
     id = HiddenField('ID')
     start_nr = IntegerField('Start Number')
-    first_name = StringField('First Name', validators=[DataRequired()])
-    last_name = StringField('Last Name', validators=[DataRequired()])
-    address = StringField('Address', validators=[DataRequired()])
-    postal_code = StringField('Postal Code', validators=[DataRequired()])
-    city = StringField('City', validators=[DataRequired()])
+    first_name = StringField('Vorname', validators=[DataRequired()])
+    last_name = StringField('Name', validators=[DataRequired()])
+    address = StringField('Addresse', validators=[DataRequired()])
+    postal_code = StringField('PLZ', validators=[DataRequired()])
+    city = StringField('Ort', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    phone = StringField('Phone', validators=[DataRequired()])
-    time1 = StringField('Time 1')
-    time2 = StringField('Time 2')
-    time3 = StringField('Time 3')
-    time4 = StringField('Time 4')
-    time5 = StringField('Time 5')
-    shortest_time = StringField('Shortest Time', render_kw={'readonly': True})
-    submit = SubmitField('Submit')
+    phone = StringField('Telefon', validators=[DataRequired()])
+    time1 = StringField('Zeit 1')
+    time2 = StringField('Zeit 2')
+    time3 = StringField('Zeit 3')
+    time4 = StringField('Zeit 4')
+    time5 = StringField('Zeit 5')
+    longest_time = StringField('Längste Zeit', render_kw={'readonly': True})
+    submit = SubmitField('Speichern')
 
     def load_data(self, participant):
         self.id.data = participant.id
@@ -60,7 +60,7 @@ class ParticipantForm(FlaskForm):
         self.time3.data = participant.time3
         self.time4.data = participant.time4
         self.time5.data = participant.time5
-        self.shortest_time.data = participant.shortest_time
+        self.longest_time.data = participant.longest_time
 
     def update_data(self, participant):
         participant.start_nr = self.start_nr.data
