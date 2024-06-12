@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  bullriding:
+    image: swisi/bullriding_2024:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=production
+    restart: always
