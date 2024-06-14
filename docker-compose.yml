@@ -11,6 +11,8 @@ services:
       - DATABASE_URL=sqlite:///app/database/site.db  # SQLite-Datenbank-URL
     volumes:
       - db-data:/app/database
+    entrypoint: ["/app/entrypoint.sh"]
+    command: ["flask", "run", "--host=0.0.0.0"]
     restart: always
 
 volumes:
