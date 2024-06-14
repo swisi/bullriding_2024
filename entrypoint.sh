@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Pfad zur Datenbankdatei
-DB_FILE=/app/database/site.db
+DB_FILE=/br/app/database/site.db
 
 if [ ! -f "$DB_FILE" ]; then
   echo "Datenbankdatei nicht gefunden. Erstelle eine neue Datenbank..."
