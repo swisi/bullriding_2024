@@ -8,10 +8,10 @@ services:
     environment:
       - FLASK_APP=app
       - FLASK_ENV=production
-      - DATABASE_URL=sqlite:///app/app/database/site.db
+      - DATABASE_URL=sqlite:///app/database/site.db
     volumes:
       - db-data:/app/database
-    entrypoint: ["sh", "/app/app/entrypoint.sh"]
+    entrypoint: ["sh", "/app/entrypoint.sh"]
     command: ["flask", "run", "--host=0.0.0.0"]
     restart: always
 

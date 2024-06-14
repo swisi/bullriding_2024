@@ -1,8 +1,13 @@
 #!/bin/sh
 
 # Pfad zur Datenbankdatei
-DB_FILE=/app/app/database/site.db
+DB_DIR=/app/database
+DB_FILE=$DB_DIR/site.db
 
+# Erstellen Sie das Verzeichnis, falls es nicht existiert
+mkdir -p $DB_DIR
+
+# Überprüfen, ob die Datenbankdatei existiert
 if [ ! -f "$DB_FILE" ]; then
   echo "Datenbankdatei nicht gefunden. Erstelle eine neue Datenbank..."
   flask db init
