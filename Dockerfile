@@ -2,7 +2,7 @@
 FROM python:3.12-slim
 
 # Setzen Sie das Arbeitsverzeichnis im Container
-WORKDIR /br
+WORKDIR /app
 
 # Kopieren Sie die Anforderungen und installieren Sie sie
 COPY requirements.txt requirements.txt
@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Erstellen Sie das Verzeichnis für die Datenbank, falls es nicht existiert
-RUN mkdir -p /br/app/database
+RUN mkdir -p /app/app/database
 
 # Setzen Sie die Flask-Umgebungsvariablen
 ENV FLASK_APP=app
