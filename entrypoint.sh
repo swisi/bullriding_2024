@@ -1,14 +1,17 @@
 #!/bin/sh
 
-# Warte, bis die Datenbank verfügbar ist
-while ! nc -z db 5432; do
-  sleep 0.1
-done
+# Pfad zur Datenbankdatei
+DB_FILE=/app/database/site.db
 
-# Datenbankmigrationen durchführen
-flask db init || true
-flask db migrate || true
-flask db upgrade
+if [ ! -f "$DB_FILE" ]; then
+  echo "Datenbankdatei nicht gefunden. Erstelle eine neue Datenbank..."
+  flask db init
+  flask db migrate
+  flask db upgrade
+else
+  echo "Datenbankdatei gefunden. Führe ein Upgrade durch..."
+  flask db upgrade
+fi
 
 # Starten Sie die Anwendung
 exec "$@"
