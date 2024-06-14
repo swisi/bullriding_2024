@@ -11,7 +11,7 @@ services:
       - DATABASE_URL=sqlite:///app/database/site.db
     volumes:
       - db-data:/app/database
-    entrypoint: ["/app/entrypoint.sh"]
+    entrypoint: ["sh", "/app/entrypoint.sh"]
     command: ["flask", "run", "--host=0.0.0.0"]
     restart: always
 
