@@ -36,7 +36,7 @@ class ParticipantForm(FlaskForm):
     postal_code = StringField('PLZ', validators=[DataRequired()])
     city = StringField('Ort', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    phone = StringField('Telefon', validators=[DataRequired()])
+    phone = StringField('Telefon')
     time1 = StringField('Zeit 1')
     time2 = StringField('Zeit 2')
     time3 = StringField('Zeit 3')

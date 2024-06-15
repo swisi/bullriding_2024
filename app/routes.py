@@ -12,8 +12,10 @@ bp = Blueprint('main', __name__)
 @login_required
 def index():
     participants = Participant.query.all() if current_user.is_authenticated else []
-    participants.sort(key=lambda p: p.longest_time if p.longest_time is not None else 0, reverse=True)
-    return render_template('index.html', title='Home', participants=participants)
+    #participants.sort(key=lambda p: p.longest_time if p.longest_time is not None else 0, reverse=True) Sortierung nach längster Dauer
+    participants.sort(key=lambda p: p.start_nr if p.start_nr is not None else 0)  # Sortierung nach Startnummer
+    aparticipant = Participant.query.filter_by(active=True).first()
+    return render_template('index.html', title='Home', participants=participants, aparticipant=aparticipant)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -91,17 +93,53 @@ def participant_delete(id):
     flash('Participant deleted successfully!', 'success')
     return redirect(url_for('main.index'))
 
-
 @bp.route('/update_times/<int:id>', methods=['POST'])
 @login_required
 def update_times(id):
     participant = Participant.query.get_or_404(id)
-    participant.time1 = request.form.get('time1', type=float)
-    participant.time2 = request.form.get('time2', type=float)
-    participant.time3 = request.form.get('time3', type=float)
-    participant.time4 = request.form.get('time4', type=float)
-    participant.time5 = request.form.get('time5', type=float)
     
-    db.session.commit()
-    flash('Times updated successfully!', 'success')
+    if 'update_times' in request.form:
+        participant.time1 = request.form.get('time1', type=float)
+        participant.time2 = request.form.get('time2', type=float)
+        participant.time3 = request.form.get('time3', type=float)
+        participant.time4 = request.form.get('time4', type=float)
+        participant.time5 = request.form.get('time5', type=float)
+        db.session.commit()
+        flash('Times updated successfully!', 'success')
+    
+    if 'set_active' in request.form:
+        Participant.query.update({Participant.active: False})  # Setze alle auf inaktiv
+        participant.active = True
+        db.session.commit()
+        flash('Active participant set successfully!', 'success')
+
     return redirect(url_for('main.index'))
+
+@bp.route('/update_atimes/<int:id>', methods=['POST'])
+@login_required
+def update_atimes(id):
+    participant = Participant.query.get_or_404(id)
+    
+    if 'update_times' in request.form:
+        participant.time1 = request.form.get('time1', type=float)
+        participant.time2 = request.form.get('time2', type=float)
+        participant.time3 = request.form.get('time3', type=float)
+        participant.time4 = request.form.get('time4', type=float)
+        participant.time5 = request.form.get('time5', type=float)
+        db.session.commit()
+        flash('Times updated successfully!', 'success')
+    
+    if 'set_active' in request.form:
+        Participant.query.update({Participant.active: False})  # Setze alle auf inaktiv
+        participant.active = True
+        db.session.commit()
+        flash('Active participant set successfully!', 'success')
+
+    return redirect(url_for('main.index'))
+
+@bp.route('/ranking')
+@login_required
+def ranking():
+    participants = Participant.query.all() if current_user.is_authenticated else []
+    rankings = sorted(participants, key=lambda p: p.longest_time if p.longest_time is not None else 0, reverse=True)
+    return render_template('ranking.html', title='Rangliste', rankings=rankings)

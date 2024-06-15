@@ -1,12 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
-  
-
   {% if current_user.is_authenticated %}
-    <h2>Teilnehmer</h2>
+
+  <h2>Aktiver Reiter</h2>
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>Start Nr.</th>
+        <th>Vorname</th>
+        <th>Name</th>
+        <th>Zeit 1</th>
+        <th>Zeit 2</th>
+        <th>Zeit 3</th>
+        <th>Zeit 4</th>
+        <th>Zeit 5</th>
+        <th>Längste Zeit</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <form method="POST" action="{{ url_for('main.update_atimes', id=aparticipant.id) }}">
+            <td>{{ aparticipant.start_nr }}</td>
+            <td>{{ aparticipant.first_name }}</td>
+            <td>{{ aparticipant.last_name }}</td>
+            <td><input type="text" name="time1" value="{{ aparticipant.time1 or '' }}" class="form-control form-control-sm"></td>
+            <td><input type="text" name="time2" value="{{ aparticipant.time2 or '' }}" class="form-control form-control-sm"></td>
+            <td><input type="text" name="time3" value="{{ aparticipant.time3 or '' }}" class="form-control form-control-sm"></td>
+            <td><input type="text" name="time4" value="{{ aparticipant.time4 or '' }}" class="form-control form-control-sm"></td>
+            <td><input type="text" name="time5" value="{{ aparticipant.time5 or '' }}" class="form-control form-control-sm"></td>
+            <td>{{ aparticipant.longest_time }}</td>
+            <td>
+              <button type="submit" name="update_times" class="btn btn-primary btn-sm">
+                <i class="fas fa-save fa-sm"></i>
+              </button>
+            </td>
+            <td>
+              
+            </td>
+          </form>
+        </tr>
+    </tbody>
+  </table>
+
+
+  <h2>Teilnehmer</h2>
     <table class="table table-striped table-sm">
       <thead>
         <tr>
+          <th>Aktiv</th>
           <th>Start Nr.</th>
           <th>Vorname</th>
           <th>Name</th>
@@ -24,6 +66,11 @@
         {% for participant in participants %}
           <tr>
             <form method="POST" action="{{ url_for('main.update_times', id=participant.id) }}">
+              <td>
+                <button type="submit" name="set_active" value="{{ participant.id }}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-play-circle"></i>
+                </button>
+              </td>
               <td>{{ participant.start_nr }}</td>
               <td>{{ participant.first_name }}</td>
               <td>{{ participant.last_name }}</td>
@@ -34,7 +81,7 @@
               <td><input type="text" name="time5" value="{{ participant.time5 or '' }}" class="form-control form-control-sm"></td>
               <td>{{ participant.longest_time }}</td>
               <td>
-                <button type="submit" class="btn btn-primary btn-sm">
+                <button type="submit" name="update_times" class="btn btn-primary btn-sm">
                   <i class="fas fa-save fa-sm"></i>
                 </button>
               </td>
