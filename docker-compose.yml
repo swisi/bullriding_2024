@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   bullriding:
-    build:
-      context: .
+    image: swisi/bullriding_2024:latest
     ports:
       - "5000:5000"
     environment:
