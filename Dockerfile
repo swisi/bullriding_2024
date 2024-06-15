@@ -13,4 +13,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # Run the application
-CMD ["sh", "-c", "mkdir -p /app/database && flask db upgrade && flask run --host=0.0.0.0"]
+#CMD ["sh", "-c", "mkdir -p /app/database && flask db upgrade && flask run --host=0.0.0.0"]
+CMD ["sh", "-c", "flask run --host=0.0.0.0"]
