@@ -2,18 +2,12 @@ version: '3.8'
 
 services:
   web:
-    image: swisi/bullriding_2024:latest  # Ersetze dies durch dein tatsächliches Image
+    image: swisi/bullriding_2024:latest
     ports:
       - "5000:5000"
     environment:
       FLASK_APP: app.py
       FLASK_ENV: development
       DATABASE_URL: sqlite:///app/database/site.db
-    volumes:
-      - db-data:/app/database
     command: >
-      sh -c "flask db upgrade &&
-             flask run --host=0.0.0.0"
-
-volumes:
-  db-data:
+      sh -c "mkdir -p /app/database && flask db upgrade && flask run --host=0.0.0.0"
