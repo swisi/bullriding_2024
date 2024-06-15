@@ -7,6 +7,10 @@ from config import Config
 # Verzeichnis-Erstellung
 basedir = os.path.abspath(os.path.dirname(__file__))
 database_dir = os.path.join(basedir, 'database')
+
+print(database_dir)
+
+
 if not os.path.exists(database_dir):
     os.makedirs(database_dir)
 

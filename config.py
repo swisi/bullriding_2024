@@ -7,3 +7,5 @@ class Config:
     database_path = os.path.join(basedir, 'database', 'site.db')
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', f'sqlite:///{database_path}')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    print(SQLALCHEMY_DATABASE_URI)
