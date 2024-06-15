@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    image: swisi/bullriding_2024:latest  # Ersetze dies durch dein tatsächliches Image
     ports:
       - "5000:5000"
     environment:
@@ -10,7 +10,6 @@ services:
       FLASK_ENV: development
       DATABASE_URL: sqlite:///app/database/site.db
     volumes:
-      - .:/app
       - db-data:/app/database
     command: >
       sh -c "flask db upgrade &&
