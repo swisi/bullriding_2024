@@ -39,8 +39,16 @@ def get_current_round(participants):
 @login_required
 def index():
     participants = Participant.query.all() if current_user.is_authenticated else []
-    participants.sort(key=lambda p: p.start_nr if p.start_nr is not None else 0)  # Sortierung nach Startnummer
-    
+    #participants.sort(key=lambda p: p.start_nr if p.start_nr is not None else 0)  # Sortierung nach Startnummer
+    participants.sort(key=lambda p: (
+        p.time6 if p.time6 is not None else float('-inf'),
+        p.time5 if p.time5 is not None else float('-inf'),
+        p.time4 if p.time4 is not None else float('-inf'),
+        p.time3 if p.time3 is not None else float('-inf'),
+        p.time2 if p.time2 is not None else float('-inf'),
+        p.time1 if p.time1 is not None else float('-inf')
+    ), reverse=True)
+
     if participants is None:
         flash('Keine Teilnemer gefunden')
         form = ParticipantForm()
