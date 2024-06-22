@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  bullriding:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:///app/database/site.db
+    volumes:
+      - db-data:/app/database
+    entrypoint: ["sh", "/app/entrypoint.sh"]
+    command: ["flask", "run", "--host=0.0.0.0"]
+    restart: always
+
+volumes:
+  db-data:
