@@ -3,129 +3,112 @@
   {% if current_user.is_authenticated %}
 
   <h2>Teilnehmer</h2>
-  <table class="table table-striped table-sm">
-    <thead>
-      <tr>
-        <th>Aktiv</th>
-        <th>Start Nr.</th>
-        <th>Vorname</th>
-        <th>Name</th>
-        <th>Runde 1</th>
-        <th>Bestanden</th>
-        {% if current_round > 1 %}
-          <th>Runde 2</th>
+  <form method="POST" action="{{ url_for('main.update_times_bulk') }}" class="update-form">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Aktiv</th>
+          <th>Start Nr.</th>
+          <th>Vorname</th>
+          <th>Name</th>
+          <th>Runde 1</th>
           <th>Bestanden</th>
-        {% endif %}
-        {% if current_round > 2 %}
-          <th>Runde 3</th>
-          <th>Bestanden</th>
-        {% endif %}
-        {% if current_round > 3 %}
-          <th>Runde 4</th>
-          <th>Bestanden</th>
-        {% endif %}
-        {% if current_round > 4 %}
-          <th>Runde 5</th>
-          <th>Bestanden</th>
-        {% endif %}
-        {% if current_round > 5 %}
-          <th>Runde 6</th>
-          <th>Bestanden</th>
-        {% endif %}
-        <th>Längste Runde</th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for participant in participants %}
-        <tr class="{% if participant.active %}table-success{% endif %}">
-          <td>
-            <form method="POST" action="{{ url_for('main.update_times', id=participant.id) }}">
-              <button type="submit" name="set_active" value="{{ participant.id }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-play-circle"></i>
-              </button>
-            </form>
-          </td>
-          <td>{{ participant.start_nr }}</td>
-          <td>{{ participant.first_name }}</td>
-          <td>{{ participant.last_name }}</td>
-          <td>
-            <form method="POST" action="{{ url_for('main.update_times', id=participant.id) }}" class="update-form">
-              <input type="text" name="time1" value="{{ participant.time1 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
-          </td>
-          <td>
-              <input type="checkbox" name="round1_passed" {% if participant.round1_passed %}checked{% endif %} onchange="submitCheckbox(this)">
-          </td>
           {% if current_round > 1 %}
-          <td>
-              <input type="text" name="time2" value="{{ participant.time2 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
-          </td>
-          <td>
-              <input type="checkbox" name="round2_passed" {% if participant.round2_passed %}checked{% endif %} onchange="submitCheckbox(this)">
-          </td>
+            <th>Runde 2</th>
+            <th>Bestanden</th>
           {% endif %}
           {% if current_round > 2 %}
-          <td>
-              <input type="text" name="time3" value="{{ participant.time3 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
-          </td>
-          <td>
-              <input type="checkbox" name="round3_passed" {% if participant.round3_passed %}checked{% endif %} onchange="submitCheckbox(this)">
-          </td>
+            <th>Runde 3</th>
+            <th>Bestanden</th>
           {% endif %}
           {% if current_round > 3 %}
-          <td>
-              <input type="text" name="time4" value="{{ participant.time4 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
-          </td>
-          <td>
-              <input type="checkbox" name="round4_passed" {% if participant.round4_passed %}checked{% endif %} onchange="submitCheckbox(this)">
-          </td>
+            <th>Runde 4</th>
+            <th>Bestanden</th>
           {% endif %}
           {% if current_round > 4 %}
-          <td>
-              <input type="text" name="time5" value="{{ participant.time5 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
-          </td>
-          <td>
-              <input type="checkbox" name="round5_passed" {% if participant.round5_passed %}checked{% endif %} onchange="submitCheckbox(this)">
-          </td>
+            <th>Runde 5</th>
+            <th>Bestanden</th>
           {% endif %}
           {% if current_round > 5 %}
-          <td>
-              <input type="text" name="time6" value="{{ participant.time6 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
-          </td>
-          <td>
-              <input type="checkbox" name="round6_passed" {% if participant.round6_passed %}checked{% endif %} onchange="submitCheckbox(this)">
-          </td>
+            <th>Runde 6</th>
+            <th>Bestanden</th>
           {% endif %}
-          <td>{{ participant.longest_time }}</td>
-          <td>
-              <button type="submit" name="update_times" class="btn btn-primary btn-sm">
-                <i class="fas fa-save fa-sm"></i>
-              </button>
-            </form>
-          </td>
-          <td>
-            <a href="{{ url_for('main.participant_edit', id=participant.id) }}" class="btn btn-primary btn-sm">
-              <i class="fas fa-edit fa-sm"></i>
-            </a>
-          </td>
+          <th>Längste Runde</th>
+          <th></th>
+          <th></th>
         </tr>
-      {% endfor %}
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="14">
-          <form method="POST" action="{{ url_for('main.finish_round', round_number=current_round) }}">
-            <button type="submit" class="btn btn-secondary btn-sm">Runde {{ current_round }} abschliessen</button>
-          </form>
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+      </thead>
+      <tbody>
+        {% for participant in participants %}
+          <tr class="{% if participant.active %}table-success{% endif %}">
+            <td>
+              <form method="POST" action="{{ url_for('main.set_active', id=participant.id) }}">
+                <button type="submit" class="btn btn-primary btn-sm">
+                  <i class="fas fa-play-circle"></i>
+                </button>
+              </form>
+            </td>
+            <td>{{ participant.start_nr }}</td>
+            <td>{{ participant.first_name }}</td>
+            <td>{{ participant.last_name }}</td>
+            <td>
+              <input type="text" name="time1_{{ participant.id }}" value="{{ participant.time1 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
+            </td>
+            <td>
+              <input type="checkbox" name="round1_passed_{{ participant.id }}" {% if participant.round1_passed %}checked{% endif %} onclick="submitCheckbox(this)">
+            </td>
+            {% if current_round > 1 %}
+              <td>
+                <input type="text" name="time2_{{ participant.id }}" value="{{ participant.time2 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
+              </td>
+              <td>
+                <input type="checkbox" name="round2_passed_{{ participant.id }}" {% if participant.round2_passed %}checked{% endif %} onclick="submitCheckbox(this)">
+              </td>
+            {% endif %}
+            {% if current_round > 2 %}
+              <td>
+                <input type="text" name="time3_{{ participant.id }}" value="{{ participant.time3 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
+              </td>
+              <td>
+                <input type="checkbox" name="round3_passed_{{ participant.id }}" {% if participant.round3_passed %}checked{% endif %} onclick="submitCheckbox(this)">
+              </td>
+            {% endif %}
+            {% if current_round > 3 %}
+              <td>
+                <input type="text" name="time4_{{ participant.id }}" value="{{ participant.time4 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
+              </td>
+              <td>
+                <input type="checkbox" name="round4_passed_{{ participant.id }}" {% if participant.round4_passed %}checked{% endif %} onclick="submitCheckbox(this)">
+              </td>
+            {% endif %}
+            {% if current_round > 4 %}
+              <td>
+                <input type="text" name="time5_{{ participant.id }}" value="{{ participant.time5 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
+              </td>
+              <td>
+                <input type="checkbox" name="round5_passed_{{ participant.id }}" {% if participant.round5_passed %}checked{% endif %} onclick="submitCheckbox(this)">
+              </td>
+            {% endif %}
+            {% if current_round > 5 %}
+              <td>
+                <input type="text" name="time6_{{ participant.id }}" value="{{ participant.time6 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
+              </td>
+              <td>
+                <input type="checkbox" name="round6_passed_{{ participant.id }}" {% if participant.round6_passed %}checked{% endif %} onclick="submitCheckbox(this)">
+              </td>
+            {% endif %}
+            <td>{{ participant.longest_time }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
 
   <script>
     function submitAndFocusNext(event, currentField) {
-      if (event.key === "Enter") {
+      if (event.key === 'Enter') {
         event.preventDefault();
         let form = currentField.closest("form");
         let inputs = Array.from(document.querySelectorAll('input[type="text"]'));
@@ -158,8 +141,14 @@
     }
 
     function submitCheckbox(checkbox) {
-      console.log('Checkbox clicked', checkbox.name, checkbox.checked);
+      console.log('Checkbox clicked:', checkbox.name, checkbox.checked); // Debugging
+
       let form = checkbox.closest("form");
+
+      if (form === null) {
+        console.error('Form not found for the checkbox:', checkbox);
+        return;
+      }
 
       // Append hidden input to identify this submit action
       let hiddenInput = document.createElement('input');
@@ -170,6 +159,8 @@
 
       // Submit the form
       let formData = new FormData(form);
+      console.log('Form data being sent:', ...formData.entries()); // Debugging
+
       fetch(form.action, {
         method: "POST",
         body: formData,

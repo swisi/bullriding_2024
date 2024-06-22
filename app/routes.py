@@ -164,6 +164,28 @@ def update_times(id):
 
     return redirect(url_for('main.index'))
 
+@bp.route('/update_times_bulk', methods=['POST'])
+@login_required
+def update_times_bulk():
+    participants = Participant.query.all()
+    for participant in participants:
+        participant.time1 = request.form.get(f'time1_{participant.id}', type=float)
+        participant.round1_passed = f'round1_passed_{participant.id}' in request.form
+        participant.time2 = request.form.get(f'time2_{participant.id}', type=float)
+        participant.round2_passed = f'round2_passed_{participant.id}' in request.form
+        participant.time3 = request.form.get(f'time3_{participant.id}', type=float)
+        participant.round3_passed = f'round3_passed_{participant.id}' in request.form
+        participant.time4 = request.form.get(f'time4_{participant.id}', type=float)
+        participant.round4_passed = f'round4_passed_{participant.id}' in request.form
+        participant.time5 = request.form.get(f'time5_{participant.id}', type=float)
+        participant.round5_passed = f'round5_passed_{participant.id}' in request.form
+        participant.time6 = request.form.get(f'time6_{participant.id}', type=float)
+        participant.round6_passed = f'round6_passed_{participant.id}' in request.form
+
+    db.session.commit()
+    flash('Times and round statuses updated successfully!', 'success')
+    return redirect(url_for('main.index'))
+
 
 @bp.route('/finish_round/<int:round_number>', methods=['POST'])
 @login_required
@@ -192,7 +214,20 @@ def finish_round(round_number):
     
     return redirect(url_for('main.index', current_round=next_round))
 
-
+@bp.route('/set_active/<int:id>', methods=['POST'])
+@login_required
+def set_active(id):
+    # Set all participants to inactive
+    Participant.query.update({Participant.active: False})
+    
+    # Set the selected participant to active
+    active_participant = Participant.query.get(id)
+    if active_participant:
+        active_participant.active = True
+    
+    db.session.commit()
+    flash('Active participant set successfully!', 'success')
+    return redirect(url_for('main.index'))
 
 @bp.route('/ranking')
 @login_required
