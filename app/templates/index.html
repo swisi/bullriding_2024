@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-  {% if current_user.is_authenticated %}
 
   <h2>Teilnehmer</h2>
   <form method="POST" action="{{ url_for('main.update_times_bulk') }}" class="update-form">
@@ -222,7 +221,4 @@
     }
   </script>
 
-  {% else %}
-    <p>Please Login!</p>
-  {% endif %}
 {% endblock %}

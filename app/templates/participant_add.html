@@ -2,7 +2,7 @@
 {% block content %}
   <div class="row">
     <div class="col-md-8 offset-md-2">
-      <h2>Edit Participant</h2>
+      <h2>Add Participant</h2>
       <form method="POST" action="">
         {{ form.hidden_tag() }}
 
@@ -40,10 +40,8 @@
           </table>
         </div>
 
-
         <div class="form-group mt-4">
           {{ form.submit(class="btn btn-primary") }}
-          <a href="{{ url_for('main.participant_delete', id=participant.id) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this participant?');">Delete</a>
         </div>
       </form>
     </div>

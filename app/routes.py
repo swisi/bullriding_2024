@@ -33,13 +33,25 @@ def get_current_round(participants):
         return 5
     else:
         return 6
-
 @bp.route('/')
 @bp.route('/index')
-@login_required
 def index():
-    participants = Participant.query.all() if current_user.is_authenticated else []
-    #participants.sort(key=lambda p: p.start_nr if p.start_nr is not None else 0)  # Sortierung nach Startnummer
+    if not current_user.is_authenticated:
+        # Zeige nur die Rangliste, wenn der Benutzer nicht eingeloggt ist
+        participants = Participant.query.all()
+        rankings = sorted(participants, key=lambda p: (
+            p.time6 if p.time6 is not None else float('-inf'),
+            p.time5 if p.time5 is not None else float('-inf'),
+            p.time4 if p.time4 is not None else float('-inf'),
+            p.time3 if p.time3 is not None else float('-inf'),
+            p.time2 if p.time2 is not None else float('-inf'),
+            p.time1 if p.time1 is not None else float('-inf')
+        ), reverse=True)
+
+        return render_template('ranking.html', title='Rangliste', rankings=rankings)
+
+    # Falls der Benutzer eingeloggt ist, zeige die vollständige Ansicht
+    participants = Participant.query.all()
     participants.sort(key=lambda p: (
         p.time6 if p.time6 is not None else float('-inf'),
         p.time5 if p.time5 is not None else float('-inf'),
@@ -50,11 +62,11 @@ def index():
     ), reverse=True)
 
     if participants is None:
-        flash('Keine Teilnemer gefunden')
+        flash('Keine Teilnehmer gefunden')
         form = ParticipantForm()
-        return render_template('participant.html', title='Add Participant', form=form)
+        return render_template('participant.html', title='Teilnehmer hinzufügen', form=form)
     
-    # Get current_round from query parameter or calculate it dynamically
+    # Hole den aktuellen Rundenzähler aus den Query-Parametern oder berechne ihn dynamisch
     current_round = request.args.get('current_round', default=None, type=int)
     if current_round is None:
         current_round = get_current_round(participants)
@@ -70,7 +82,6 @@ def index():
         round5_passed=check_round_passed(participants, 5),
         current_round=current_round
     )
-
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -105,9 +116,15 @@ def register():
         return redirect(url_for('main.login'))
     return render_template('register.html', title='Register', form=form)
 
-@bp.route('/participant', methods=['GET', 'POST'])
+@bp.route('/participants')
 @login_required
 def participant():
+    participants = Participant.query.all()
+    return render_template('participant.html', title='Alle Teilnehmer', participants=participants)
+
+@bp.route('/participant_add', methods=['GET', 'POST'])
+@login_required
+def participant_add():
     form = ParticipantForm()
     if form.validate_on_submit():
         participant = Participant()
@@ -116,7 +133,7 @@ def participant():
         db.session.commit()
         flash('Participant added successfully!', 'success')
         return redirect(url_for('main.index'))
-    return render_template('participant.html', title='Add Participant', form=form)
+    return render_template('participant_add.html', title='Add Participant', form=form)
 
 @bp.route('/participant_edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -129,7 +146,7 @@ def participant_edit(id):
         flash('Participant updated successfully!', 'success')
         return redirect(url_for('main.index'))
     form.load_data(participant)
-    form.longest_time.data = participant.longest_time
+    
     return render_template('participant_edit.html', title='Edit Participant', form=form, participant=participant)
 
 @bp.route('/participant_delete/<int:id>', methods=['POST', 'GET'])
@@ -194,7 +211,6 @@ def update_times_bulk():
     flash('Times and round statuses updated successfully!', 'success')
     return redirect(url_for('main.index'))
 
-
 @bp.route('/finish_round/<int:round_number>', methods=['POST'])
 @login_required
 def finish_round(round_number):
@@ -237,7 +253,7 @@ def set_active(id):
     flash('Active participant set successfully!', 'success')
     return redirect(url_for('main.index'))
 
-@bp.route('/reset_results', methods=['POST'])
+@bp.route('/reset_results')
 @login_required
 def reset_fields():
     participants = Participant.query.all()
@@ -257,11 +273,17 @@ def reset_fields():
     flash('All fields have been reset to NULL.', 'success')
     return redirect(url_for('main.index'))
 
+@bp.route('/reset_participants')
+@login_required
+def reset_participants():
+    Participant.query.delete()
+    db.session.commit()
+    flash('Alle Teilnehmer wurden gelöscht.', 'success')
+    return redirect(url_for('main.participant'))
 
 @bp.route('/ranking')
-@login_required
 def ranking():
-    participants = Participant.query.all() if current_user.is_authenticated else []
+    participants = Participant.query.all()
     rankings = sorted(participants, key=lambda p: (
         p.time6 if p.time6 is not None else float('-inf'),
         p.time5 if p.time5 is not None else float('-inf'),

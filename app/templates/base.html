@@ -23,12 +23,24 @@
           </li>
           {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('main.participant') }}">Teilnehmer erfassen</a>
+              <a class="nav-link" href="{{ url_for('main.participant') }}">Teilnehmer Liste</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('main.participant_add') }}">Teilnehmer erfassen</a>
             </li>
           {% endif %}
         </ul>
         <ul class="navbar-nav ml-auto">
           {% if current_user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="adminMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Admin
+              </a>
+              <div class="dropdown-menu" aria-labelledby="adminMenu">
+                <a class="dropdown-item" href="{{ url_for('main.reset_fields') }}">Resultate löschen</a>
+                <a class="dropdown-item" href="{{ url_for('main.reset_participants') }}">Teilnehmer löschen</a>
+              </div>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a>
             </li>

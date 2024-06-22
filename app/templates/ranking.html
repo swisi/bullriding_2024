@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-  {% if current_user.is_authenticated %}
     <h2>Aktuelle Rangliste</h2>
     <table class="table table-striped table-sm">
       <thead>
@@ -13,7 +12,7 @@
           <th>Zeit 3</th>
           <th>Zeit 4</th>
           <th>Zeit 5</th>
-          <th>Längste Zeit</th>
+          <th>Zeit 6</th>
         </tr>
       </thead>
       <tbody>
@@ -22,17 +21,15 @@
             <td>{{ ranking.start_nr }}</td>
             <td>{{ ranking.first_name }}</td>
             <td>{{ ranking.last_name }}</td>
-            <td>{{ ranking.time1 }}</td>
-            <td>{{ ranking.time2 }}</td>
-            <td>{{ ranking.time3 }}</td>
-            <td>{{ ranking.time4 }}</td>
-            <td>{{ ranking.time5 }}</td>
-            <td>{{ ranking.longest_time }}</td>
+            <td>{{ ranking.time1 | default('') }}</td>
+            <td>{{ ranking.time2 | default('') }}</td>
+            <td>{{ ranking.time3 | default('') }}</td>
+            <td>{{ ranking.time4 | default('') }}</td>
+            <td>{{ ranking.time5 | default('') }}</td>
+            <td>{{ ranking.time6 | default('') }}</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
-  {% else %}
-    <p>Please Login!</p>
-  {% endif %}
+
 {% endblock %}
