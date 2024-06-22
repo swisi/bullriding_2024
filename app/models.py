@@ -42,8 +42,24 @@ class Participant(db.Model):
     round3_passed = db.Column(db.Boolean, default=False)
     round4_passed = db.Column(db.Boolean, default=False)
     round5_passed = db.Column(db.Boolean, default=False)
+    round1_qualified = db.Column(db.Boolean, default=False)
+    round2_qualified = db.Column(db.Boolean, default=False)
+    round3_qualified = db.Column(db.Boolean, default=False)
+    round4_qualified = db.Column(db.Boolean, default=False)
+    round5_qualified = db.Column(db.Boolean, default=False)
+    round6_qualified = db.Column(db.Boolean, default=False)
 
     @property
-    def longest_time(self):
-        times = [t for t in [self.time1, self.time2, self.time3, self.time4, self.time5] if t is not None]
+    def toptime_Vorrunde(self):
+        times = [t for t in [self.time1, self.time2, self.time3] if t is not None]
+        return max(times) if times else None
+
+    @property
+    def toptime_Zwischenrunde(self):
+        times = [t for t in [self.time1, self.time2, self.time3] if t is not None]
+        return max(times) if times else None
+
+    @property
+    def toptime_Finalrunde(self):
+        times = [t for t in [self.time1, self.time2, self.time3] if t is not None]
         return max(times) if times else None

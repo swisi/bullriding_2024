@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from app import db
 from app.models import User, Participant
-from app.forms import LoginForm, RegistrationForm, ParticipantForm  # Entfernen Sie TimeEntryForm
+from app.forms import LoginForm, RegistrationForm, ParticipantForm
 
 bp = Blueprint('main', __name__)
 
@@ -33,40 +33,32 @@ def get_current_round(participants):
         return 5
     else:
         return 6
+
 @bp.route('/')
 @bp.route('/index')
 def index():
     if not current_user.is_authenticated:
-        # Zeige nur die Rangliste, wenn der Benutzer nicht eingeloggt ist
         participants = Participant.query.all()
         rankings = sorted(participants, key=lambda p: (
-            p.time6 if p.time6 is not None else float('-inf'),
-            p.time5 if p.time5 is not None else float('-inf'),
-            p.time4 if p.time4 is not None else float('-inf'),
-            p.time3 if p.time3 is not None else float('-inf'),
-            p.time2 if p.time2 is not None else float('-inf'),
-            p.time1 if p.time1 is not None else float('-inf')
+            p.toptime_Finalrunde if p.toptime_Finalrunde is not None else float('-inf'),
+            p.toptime_Zwischenrunde if p.toptime_Zwischenrunde is not None else float('-inf'),
+            p.toptime_Vorrunde if p.toptime_Vorrunde is not None else float('-inf')
         ), reverse=True)
 
         return render_template('ranking.html', title='Rangliste', rankings=rankings)
 
-    # Falls der Benutzer eingeloggt ist, zeige die vollständige Ansicht
     participants = Participant.query.all()
     participants.sort(key=lambda p: (
-        p.time6 if p.time6 is not None else float('-inf'),
-        p.time5 if p.time5 is not None else float('-inf'),
-        p.time4 if p.time4 is not None else float('-inf'),
-        p.time3 if p.time3 is not None else float('-inf'),
-        p.time2 if p.time2 is not None else float('-inf'),
-        p.time1 if p.time1 is not None else float('-inf')
+            p.toptime_Finalrunde if p.toptime_Finalrunde is not None else float('-inf'),
+            p.toptime_Zwischenrunde if p.toptime_Zwischenrunde is not None else float('-inf'),
+            p.toptime_Vorrunde if p.toptime_Vorrunde is not None else float('-inf')
     ), reverse=True)
 
-    if participants is None:
+    if not participants:
         flash('Keine Teilnehmer gefunden')
         form = ParticipantForm()
         return render_template('participant.html', title='Teilnehmer hinzufügen', form=form)
     
-    # Hole den aktuellen Rundenzähler aus den Query-Parametern oder berechne ihn dynamisch
     current_round = request.args.get('current_round', default=None, type=int)
     if current_round is None:
         current_round = get_current_round(participants)
@@ -82,6 +74,7 @@ def index():
         round5_passed=check_round_passed(participants, 5),
         current_round=current_round
     )
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -182,7 +175,7 @@ def update_times(id):
         flash('Times and round statuses updated successfully!', 'success')
     
     if 'set_active' in request.form:
-        Participant.query.update({Participant.active: False})  # Setze alle auf inaktiv
+        Participant.query.update({Participant.active: False})
         participant.active = True
         db.session.commit()
         flash('Active participant set successfully!', 'success')
@@ -211,66 +204,192 @@ def update_times_bulk():
     flash('Times and round statuses updated successfully!', 'success')
     return redirect(url_for('main.index'))
 
-@bp.route('/finish_round/<int:round_number>', methods=['POST'])
+@bp.route('/finish_round/<string:round>', methods=['POST'])
 @login_required
-def finish_round(round_number):
-    participants = Participant.query.all()
+def finish_round(round):
     
-    for participant in participants:
-        if round_number == 1:
-            participant.round1_passed = f'round1_passed_{participant.id}' in request.form
-        elif round_number == 2:
-            participant.round2_passed = f'round2_passed_{participant.id}' in request.form
-        elif round_number == 3:
-            participant.round3_passed = f'round3_passed_{participant.id}' in request.form
-        elif round_number == 4:
-            participant.round4_passed = f'round4_passed_{participant.id}' in request.form
-        elif round_number == 5:
-            participant.round5_passed = f'round5_passed_{participant.id}' in request.form
-        elif round_number == 6:
-            participant.round6_passed = f'round6_passed_{participant.id}' in request.form
+
+    if round == 'VR1':
+        participants = Participant.query.all()
+        # Sortiere Teilnehmer nach Zeit in der ersten Vorrunde in absteigender Reihenfolge
+        sorted_participants = sorted(participants, key=lambda p: p.time1 if p.time1 is not None else float('-inf'), reverse=True)
+
+        # Ausgabe der sortierten Teilnehmer zur Überprüfung
+        #print("Sortierte Teilnehmer in VR1:")
+        #for participant in sorted_participants:
+        #    print(f"Teilnehmer ID: {participant.id}, Zeit: {participant.time1}")
+
+
+        # Setze alle Teilnehmer auf nicht qualifiziert
+        for participant in participants:
+            participant.round1_qualified = False
+            participant.round1_passed = False
+
+        # Qualifiziere alle Teilnehmer mit Zeit >= 99 Sekunden
+        qualified_participants = []
+        for participant in participants:
+            if participant.time1 is not None and participant.time1 >= 99:
+                participant.round1_qualified = True
+                participant.round2_qualified = True
+                participant.round3_qualified = True
+                participant.round1_passed = False
+                qualified_participants.append(participant)
+
+        # Fülle die Qualifikationen auf, bis mindestens 5 Teilnehmer qualifiziert sind
+        for participant in sorted_participants:
+            if len(qualified_participants) < 5:
+                if not participant.round1_qualified:  # Nur nicht bereits qualifizierte Teilnehmer hinzufügen
+                    participant.round1_qualified = True
+                    participant.round2_qualified = True
+                    participant.round3_qualified = True
+                    participant.round1_passed = False
+                    qualified_participants.append(participant)
+            else:
+                break
+
+        # Setze alle Teilnehmer auf "Runde 1 bestanden"
+        for participant in participants:
+            if participant.round1_qualified == True:
+                pass
+            else:
+                participant.round1_passed = True
+
+    elif round == 'VR2':
+        participants = Participant.query.all()
+        # Sortiere Teilnehmer nach Zeit in der ersten Vorrunde in absteigender Reihenfolge
+        sorted_participants = sorted(participants, key=lambda p: p.time2 if p.time2 is not None else float('-inf'), reverse=True)
+
+        # Ausgabe der sortierten Teilnehmer zur Überprüfung
+        #print("Sortierte Teilnehmer in VR1:")
+        #for participant in sorted_participants:
+        #    print(f"Teilnehmer ID: {participant.id}, Zeit: {participant.time1}")
+
+
+        # Setze alle Teilnehmer auf nicht qualifiziert
+        for participant in participants:
+            participant.round2_passed = False
+
+        # Qualifiziere alle Teilnehmer mit Zeit >= 99 Sekunden
+        qualified_participants = []
+        for participant in participants:
+            if participant.time2 is not None and participant.time2 >= 99:
+                participant.round2_qualified = True
+                participant.round3_qualified = True
+                participant.round2_passed = False
+                qualified_participants.append(participant)
+
+        # Fülle die Qualifikationen auf, bis mindestens 5 Teilnehmer qualifiziert sind
+        for participant in sorted_participants:
+            if len(qualified_participants) < 5:
+                if not participant.round2_qualified :  # Nur nicht bereits qualifizierte Teilnehmer hinzufügen
+                    participant.round2_qualified = True
+                    participant.round3_qualified = True
+                    participant.round2_passed = False
+                    qualified_participants.append(participant)
+            else:
+                break
+
+        # Setze alle Teilnehmer auf "Runde 1 bestanden"
+        for participant in participants:
+            if participant.round2_qualified == True:
+                pass
+            else:
+                participant.round2_passed = True
+
+    elif round == 'VR3':
+        participants = Participant.query.all()
+        # Sortiere Teilnehmer nach Zeit in der ersten Vorrunde in absteigender Reihenfolge
+        sorted_participants = sorted(participants, key=lambda p: p.time3 if p.time3 is not None else float('-inf'), reverse=True)
+
+        # Ausgabe der sortierten Teilnehmer zur Überprüfung
+        #print("Sortierte Teilnehmer in VR1:")
+        #for participant in sorted_participants:
+        #    print(f"Teilnehmer ID: {participant.id}, Zeit: {participant.time1}")
+
+
+        # Setze alle Teilnehmer auf nicht qualifiziert
+        for participant in participants:
+            participant.round3_passed = False
+
+        # Qualifiziere alle Teilnehmer mit Zeit >= 99 Sekunden
+        qualified_participants = []
+        for participant in participants:
+            if participant.time3 is not None and participant.time3 >= 99:
+                participant.round3_qualified = True
+                participant.round3_passed = False
+                qualified_participants.append(participant)
+
+        # Fülle die Qualifikationen auf, bis mindestens 5 Teilnehmer qualifiziert sind
+        for participant in sorted_participants:
+            if len(qualified_participants) < 5:
+                if not participant.round3_qualified :  # Nur nicht bereits qualifizierte Teilnehmer hinzufügen
+                    participant.round3_qualified = True
+                    participant.round3_passed = False
+                    qualified_participants.append(participant)
+            else:
+                break
+
+        # Setze alle Teilnehmer auf "Runde 1 bestanden"
+        for participant in participants:
+            if participant.round3_qualified == True:
+                pass
+            else:
+                participant.round3_passed = True
+
+    elif round == 'ZR1':
+        for participant in participants:
+            participant.round4_passed = True
+    elif round == 'ZR2':
+        for participant in participants:
+            participant.round5_passed = True
+    elif round == 'FINAL':
+        for participant in participants:
+            participant.round6_passed = True
 
     db.session.commit()
-    flash(f'Round {round_number} finished successfully!', 'success')
+    flash(f'Runde {round} abgeschlossen!', 'success')
     
-    # Increase the round_number after finishing the current round
-    next_round = round_number + 1
-    
-    return redirect(url_for('main.index', current_round=next_round))
+    return redirect(url_for('main.index'))
+
 
 @bp.route('/set_active/<int:id>', methods=['POST'])
 @login_required
 def set_active(id):
-    # Set all participants to inactive
     Participant.query.update({Participant.active: False})
-    
-    # Set the selected participant to active
     active_participant = Participant.query.get(id)
     if active_participant:
         active_participant.active = True
-    
     db.session.commit()
     flash('Active participant set successfully!', 'success')
     return redirect(url_for('main.index'))
 
 @bp.route('/reset_results')
 @login_required
-def reset_fields():
+def reset_results():
     participants = Participant.query.all()
     for participant in participants:
+        participant.active = False
         participant.time1 = None
         participant.time2 = None
         participant.time3 = None
         participant.time4 = None
         participant.time5 = None
         participant.time6 = None
-        participant.round1_passed = None
-        participant.round2_passed = None
-        participant.round3_passed = None
-        participant.round4_passed = None
-        participant.round5_passed = None
+        participant.round1_passed = False
+        participant.round2_passed = False
+        participant.round3_passed = False
+        participant.round4_passed = False
+        participant.round5_passed = False
+        participant.round6_passed = False
+        participant.round1_qualified = False
+        participant.round2_qualified = False
+        participant.round3_qualified = False
+        participant.round4_qualified = False
+        participant.round5_qualified = False
+        participant.round6_qualified = False
+    
     db.session.commit()
-    flash('All fields have been reset to NULL.', 'success')
+    flash('All fields have been reset.', 'success')
     return redirect(url_for('main.index'))
 
 @bp.route('/reset_participants')
@@ -285,12 +404,9 @@ def reset_participants():
 def ranking():
     participants = Participant.query.all()
     rankings = sorted(participants, key=lambda p: (
-        p.time6 if p.time6 is not None else float('-inf'),
-        p.time5 if p.time5 is not None else float('-inf'),
-        p.time4 if p.time4 is not None else float('-inf'),
-        p.time3 if p.time3 is not None else float('-inf'),
-        p.time2 if p.time2 is not None else float('-inf'),
-        p.time1 if p.time1 is not None else float('-inf')
+            p.toptime_Finalrunde if p.toptime_Finalrunde is not None else float('-inf'),
+            p.toptime_Zwischenrunde if p.toptime_Zwischenrunde is not None else float('-inf'),
+            p.toptime_Vorrunde if p.toptime_Vorrunde is not None else float('-inf')
     ), reverse=True)
 
     return render_template('ranking.html', title='Rangliste', rankings=rankings)
