@@ -163,35 +163,6 @@ def update_times(id):
 
     return redirect(url_for('main.index'))
 
-@bp.route('/update_atimes/<int:id>', methods=['POST'])
-@login_required
-def update_atimes(id):
-    participant = Participant.query.get_or_404(id)
-    
-    if 'update_times' in request.form:
-        participant.time1 = request.form.get('time1', type=float)
-        participant.time2 = request.form.get('time2', type=float)
-        participant.time3 = request.form.get('time3', type=float)
-        participant.time4 = request.form.get('time4', type=float)
-        participant.time5 = request.form.get('time5', type=float)
-        participant.time6 = request.form.get('time6', type=float)
-        
-        participant.round1_passed = 'round1_passed' in request.form
-        participant.round2_passed = 'round2_passed' in request.form
-        participant.round3_passed = 'round3_passed' in request.form
-        participant.round4_passed = 'round4_passed' in request.form
-        participant.round5_passed = 'round5_passed' in request.form
-
-        db.session.commit()
-        flash('Times and round statuses updated successfully!', 'success')
-    
-    if 'set_active' in request.form:
-        Participant.query.update({Participant.active: False})  # Setze alle auf inaktiv
-        participant.active = True
-        db.session.commit()
-        flash('Active participant set successfully!', 'success')
-
-    return redirect(url_for('main.index'))
 
 @bp.route('/finish_round/<int:round_number>', methods=['POST'])
 @login_required

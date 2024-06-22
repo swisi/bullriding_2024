@@ -39,7 +39,7 @@
     </thead>
     <tbody>
       {% for participant in participants %}
-        <tr>
+        <tr class="{% if participant.active %}table-success{% endif %}">
           <td>
             <form method="POST" action="{{ url_for('main.update_times', id=participant.id) }}">
               <button type="submit" name="set_active" value="{{ participant.id }}" class="btn btn-primary btn-sm">
@@ -51,15 +51,15 @@
           <td>{{ participant.first_name }}</td>
           <td>{{ participant.last_name }}</td>
           <td>
-            <form method="POST" action="{{ url_for('main.update_times', id=participant.id) }}">
-              <input type="text" name="time1" value="{{ participant.time1 or '' }}" class="form-control form-control-sm">
+            <form method="POST" action="{{ url_for('main.update_times', id=participant.id) }}" class="update-form">
+              <input type="text" name="time1" value="{{ participant.time1 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
               <input type="checkbox" name="round1_passed_{{ participant.id }}" {% if participant.round1_passed %}checked{% endif %}>
           </td>
           {% if current_round > 1 %}
           <td>
-              <input type="text" name="time2" value="{{ participant.time2 or '' }}" class="form-control form-control-sm">
+              <input type="text" name="time2" value="{{ participant.time2 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
               <input type="checkbox" name="round2_passed_{{ participant.id }}" {% if participant.round2_passed %}checked{% endif %}>
@@ -67,7 +67,7 @@
           {% endif %}
           {% if current_round > 2 %}
           <td>
-              <input type="text" name="time3" value="{{ participant.time3 or '' }}" class="form-control form-control-sm">
+              <input type="text" name="time3" value="{{ participant.time3 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
               <input type="checkbox" name="round3_passed_{{ participant.id }}" {% if participant.round3_passed %}checked{% endif %}>
@@ -75,7 +75,7 @@
           {% endif %}
           {% if current_round > 3 %}
           <td>
-              <input type="text" name="time4" value="{{ participant.time4 or '' }}" class="form-control form-control-sm">
+              <input type="text" name="time4" value="{{ participant.time4 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
               <input type="checkbox" name="round4_passed_{{ participant.id }}" {% if participant.round4_passed %}checked{% endif %}>
@@ -83,7 +83,7 @@
           {% endif %}
           {% if current_round > 4 %}
           <td>
-              <input type="text" name="time5" value="{{ participant.time5 or '' }}" class="form-control form-control-sm">
+              <input type="text" name="time5" value="{{ participant.time5 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
               <input type="checkbox" name="round5_passed_{{ participant.id }}" {% if participant.round5_passed %}checked{% endif %}>
@@ -91,7 +91,7 @@
           {% endif %}
           {% if current_round > 5 %}
           <td>
-              <input type="text" name="time6" value="{{ participant.time6 or '' }}" class="form-control form-control-sm">
+              <input type="text" name="time6" value="{{ participant.time6 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
               <input type="checkbox" name="round6_passed_{{ participant.id }}" {% if participant.round6_passed %}checked{% endif %}>
@@ -122,6 +122,42 @@
       </tr>
     </tfoot>
   </table>
+
+  <script>
+    function submitAndFocusNext(event, currentField) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        let form = currentField.closest("form");
+        let inputs = Array.from(document.querySelectorAll('input[type="text"]'));
+        let currentIndex = inputs.indexOf(currentField);
+        
+        // Append hidden input to identify this submit action
+        let hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'update_times';
+        hiddenInput.value = 'true';
+        form.appendChild(hiddenInput);
+
+        // Submit the form
+        let formData = new FormData(form);
+        fetch(form.action, {
+          method: "POST",
+          body: formData,
+        }).then(response => {
+          if (response.ok) {
+            if (currentIndex > -1 && currentIndex < inputs.length - 1) {
+              inputs[currentIndex + 1].focus();
+            }
+          } else {
+            console.error('Form submission failed');
+          }
+        }).catch(error => {
+          console.error('Form submission error:', error);
+        });
+      }
+    }
+  </script>
+
   {% else %}
     <p>Please Login!</p>
   {% endif %}
