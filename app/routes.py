@@ -151,6 +151,7 @@ def update_times(id):
         participant.round3_passed = 'round3_passed' in request.form
         participant.round4_passed = 'round4_passed' in request.form
         participant.round5_passed = 'round5_passed' in request.form
+        participant.round6_passed = 'round6_passed' in request.form
 
         db.session.commit()
         flash('Times and round statuses updated successfully!', 'success')
@@ -180,6 +181,8 @@ def finish_round(round_number):
             participant.round4_passed = f'round4_passed_{participant.id}' in request.form
         elif round_number == 5:
             participant.round5_passed = f'round5_passed_{participant.id}' in request.form
+        elif round_number == 6:
+            participant.round6_passed = f'round6_passed_{participant.id}' in request.form
 
     db.session.commit()
     flash(f'Round {round_number} finished successfully!', 'success')
@@ -188,6 +191,8 @@ def finish_round(round_number):
     next_round = round_number + 1
     
     return redirect(url_for('main.index', current_round=next_round))
+
+
 
 @bp.route('/ranking')
 @login_required

@@ -55,14 +55,14 @@
               <input type="text" name="time1" value="{{ participant.time1 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
-              <input type="checkbox" name="round1_passed_{{ participant.id }}" {% if participant.round1_passed %}checked{% endif %}>
+              <input type="checkbox" name="round1_passed" {% if participant.round1_passed %}checked{% endif %} onchange="submitCheckbox(this)">
           </td>
           {% if current_round > 1 %}
           <td>
               <input type="text" name="time2" value="{{ participant.time2 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
-              <input type="checkbox" name="round2_passed_{{ participant.id }}" {% if participant.round2_passed %}checked{% endif %}>
+              <input type="checkbox" name="round2_passed" {% if participant.round2_passed %}checked{% endif %} onchange="submitCheckbox(this)">
           </td>
           {% endif %}
           {% if current_round > 2 %}
@@ -70,7 +70,7 @@
               <input type="text" name="time3" value="{{ participant.time3 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
-              <input type="checkbox" name="round3_passed_{{ participant.id }}" {% if participant.round3_passed %}checked{% endif %}>
+              <input type="checkbox" name="round3_passed" {% if participant.round3_passed %}checked{% endif %} onchange="submitCheckbox(this)">
           </td>
           {% endif %}
           {% if current_round > 3 %}
@@ -78,7 +78,7 @@
               <input type="text" name="time4" value="{{ participant.time4 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
-              <input type="checkbox" name="round4_passed_{{ participant.id }}" {% if participant.round4_passed %}checked{% endif %}>
+              <input type="checkbox" name="round4_passed" {% if participant.round4_passed %}checked{% endif %} onchange="submitCheckbox(this)">
           </td>
           {% endif %}
           {% if current_round > 4 %}
@@ -86,7 +86,7 @@
               <input type="text" name="time5" value="{{ participant.time5 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
-              <input type="checkbox" name="round5_passed_{{ participant.id }}" {% if participant.round5_passed %}checked{% endif %}>
+              <input type="checkbox" name="round5_passed" {% if participant.round5_passed %}checked{% endif %} onchange="submitCheckbox(this)">
           </td>
           {% endif %}
           {% if current_round > 5 %}
@@ -94,7 +94,7 @@
               <input type="text" name="time6" value="{{ participant.time6 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
           </td>
           <td>
-              <input type="checkbox" name="round6_passed_{{ participant.id }}" {% if participant.round6_passed %}checked{% endif %}>
+              <input type="checkbox" name="round6_passed" {% if participant.round6_passed %}checked{% endif %} onchange="submitCheckbox(this)">
           </td>
           {% endif %}
           <td>{{ participant.longest_time }}</td>
@@ -155,6 +155,33 @@
           console.error('Form submission error:', error);
         });
       }
+    }
+
+    function submitCheckbox(checkbox) {
+      console.log('Checkbox clicked', checkbox.name, checkbox.checked);
+      let form = checkbox.closest("form");
+
+      // Append hidden input to identify this submit action
+      let hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'update_times';
+      hiddenInput.value = 'true';
+      form.appendChild(hiddenInput);
+
+      // Submit the form
+      let formData = new FormData(form);
+      fetch(form.action, {
+        method: "POST",
+        body: formData,
+      }).then(response => {
+        if (!response.ok) {
+          console.error('Checkbox submission failed');
+        } else {
+          console.log('Checkbox submission succeeded');
+        }
+      }).catch(error => {
+        console.error('Checkbox submission error:', error);
+      });
     }
   </script>
 
