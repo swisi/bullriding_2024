@@ -21,6 +21,10 @@ ENV FLASK_ENV=production
 # Exponieren Sie den Port, auf dem die App läuft
 EXPOSE 5000
 
+# Kopiere entrypoint.sh und setze Ausführungsrechte
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Festlegen des Entrypoints
 ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
