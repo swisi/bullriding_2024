@@ -36,6 +36,12 @@ class Participant(db.Model):
     time3 = db.Column(db.Float, nullable=True)
     time4 = db.Column(db.Float, nullable=True)
     time5 = db.Column(db.Float, nullable=True)
+    time6 = db.Column(db.Float, nullable=True)
+    round1_passed = db.Column(db.Boolean, default=False)
+    round2_passed = db.Column(db.Boolean, default=False)
+    round3_passed = db.Column(db.Boolean, default=False)
+    round4_passed = db.Column(db.Boolean, default=False)
+    round5_passed = db.Column(db.Boolean, default=False)
 
     @property
     def longest_time(self):

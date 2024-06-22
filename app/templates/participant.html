@@ -40,38 +40,6 @@
           </table>
         </div>
 
-        <div class="container mt-4">
-          <h4>Times</h4>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{{ form.time1.label }}</th>
-                <th>{{ form.time2.label }}</th>
-                <th>{{ form.time3.label }}</th>
-                <th>{{ form.time4.label }}</th>
-                <th>{{ form.time5.label }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ form.time1(class="form-control") }}</td>
-                <td>{{ form.time2(class="form-control") }}</td>
-                <td>{{ form.time3(class="form-control") }}</td>
-                <td>{{ form.time4(class="form-control") }}</td>
-                <td>{{ form.time5(class="form-control") }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="container mt-4">
-          <h4>Shortest Time</h4>
-          <div class="form-group">
-            {{ form.longest_time.label }}
-            {{ form.longest_time(class="form-control") }}
-          </div>
-        </div>
-
         <div class="form-group mt-4">
           {{ form.submit(class="btn btn-primary") }}
         </div>

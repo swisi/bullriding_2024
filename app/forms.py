@@ -37,12 +37,6 @@ class ParticipantForm(FlaskForm):
     city = StringField('Ort', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Telefon')
-    time1 = StringField('Zeit 1')
-    time2 = StringField('Zeit 2')
-    time3 = StringField('Zeit 3')
-    time4 = StringField('Zeit 4')
-    time5 = StringField('Zeit 5')
-    longest_time = StringField('Längste Zeit', render_kw={'readonly': True})
     submit = SubmitField('Speichern')
 
     def load_data(self, participant):
@@ -55,12 +49,6 @@ class ParticipantForm(FlaskForm):
         self.city.data = participant.city
         self.email.data = participant.email
         self.phone.data = participant.phone
-        self.time1.data = participant.time1
-        self.time2.data = participant.time2
-        self.time3.data = participant.time3
-        self.time4.data = participant.time4
-        self.time5.data = participant.time5
-        self.longest_time.data = participant.longest_time
 
     def update_data(self, participant):
         participant.start_nr = self.start_nr.data
@@ -71,12 +59,7 @@ class ParticipantForm(FlaskForm):
         participant.city = self.city.data
         participant.email = self.email.data
         participant.phone = self.phone.data
-        participant.time1 = self._convert_to_float(self.time1.data)
-        participant.time2 = self._convert_to_float(self.time2.data)
-        participant.time3 = self._convert_to_float(self.time3.data)
-        participant.time4 = self._convert_to_float(self.time4.data)
-        participant.time5 = self._convert_to_float(self.time5.data)
-
+        
     def validate_start_nr(self, start_nr):
         if Participant.query.filter(Participant.id != self.id.data, Participant.start_nr == start_nr.data).first():
             raise ValidationError('This start number is already in use. Please choose a different one.')

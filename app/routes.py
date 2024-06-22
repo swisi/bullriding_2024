@@ -7,15 +7,61 @@ from app.forms import LoginForm, RegistrationForm, ParticipantForm  # Entfernen 
 
 bp = Blueprint('main', __name__)
 
+def check_round_passed(participants, round_number):
+    if round_number == 1:
+        return any(participant.round1_passed for participant in participants)
+    elif round_number == 2:
+        return any(participant.round2_passed for participant in participants)
+    elif round_number == 3:
+        return any(participant.round3_passed for participant in participants)
+    elif round_number == 4:
+        return any(participant.round4_passed for participant in participants)
+    elif round_number == 5:
+        return any(participant.round5_passed for participant in participants)
+    return False
+
+def get_current_round(participants):
+    if not check_round_passed(participants, 1):
+        return 1
+    elif not check_round_passed(participants, 2):
+        return 2
+    elif not check_round_passed(participants, 3):
+        return 3
+    elif not check_round_passed(participants, 4):
+        return 4
+    elif not check_round_passed(participants, 5):
+        return 5
+    else:
+        return 6
+
 @bp.route('/')
 @bp.route('/index')
 @login_required
 def index():
     participants = Participant.query.all() if current_user.is_authenticated else []
-    #participants.sort(key=lambda p: p.longest_time if p.longest_time is not None else 0, reverse=True) Sortierung nach längster Dauer
     participants.sort(key=lambda p: p.start_nr if p.start_nr is not None else 0)  # Sortierung nach Startnummer
-    aparticipant = Participant.query.filter_by(active=True).first()
-    return render_template('index.html', title='Home', participants=participants, aparticipant=aparticipant)
+    
+    if participants is None:
+        flash('Keine Teilnemer gefunden')
+        form = ParticipantForm()
+        return render_template('participant.html', title='Add Participant', form=form)
+    
+    # Get current_round from query parameter or calculate it dynamically
+    current_round = request.args.get('current_round', default=None, type=int)
+    if current_round is None:
+        current_round = get_current_round(participants)
+    
+    return render_template(
+        'index.html', 
+        title='Home', 
+        participants=participants, 
+        round1_passed=check_round_passed(participants, 1),
+        round2_passed=check_round_passed(participants, 2),
+        round3_passed=check_round_passed(participants, 3),
+        round4_passed=check_round_passed(participants, 4),
+        round5_passed=check_round_passed(participants, 5),
+        current_round=current_round
+    )
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -62,9 +108,6 @@ def participant():
         db.session.commit()
         flash('Participant added successfully!', 'success')
         return redirect(url_for('main.index'))
-    else:
-        #flash("Form validation failed", 'warning')
-        pass
     return render_template('participant.html', title='Add Participant', form=form)
 
 @bp.route('/participant_edit/<int:id>', methods=['GET', 'POST'])
@@ -77,9 +120,6 @@ def participant_edit(id):
         db.session.commit()
         flash('Participant updated successfully!', 'success')
         return redirect(url_for('main.index'))
-    else:
-        #flash('Form validation failed', 'warning')
-        pass
     form.load_data(participant)
     form.longest_time.data = participant.longest_time
     return render_template('participant_edit.html', title='Edit Participant', form=form, participant=participant)
@@ -104,8 +144,16 @@ def update_times(id):
         participant.time3 = request.form.get('time3', type=float)
         participant.time4 = request.form.get('time4', type=float)
         participant.time5 = request.form.get('time5', type=float)
+        participant.time6 = request.form.get('time6', type=float)
+        
+        participant.round1_passed = 'round1_passed' in request.form
+        participant.round2_passed = 'round2_passed' in request.form
+        participant.round3_passed = 'round3_passed' in request.form
+        participant.round4_passed = 'round4_passed' in request.form
+        participant.round5_passed = 'round5_passed' in request.form
+
         db.session.commit()
-        flash('Times updated successfully!', 'success')
+        flash('Times and round statuses updated successfully!', 'success')
     
     if 'set_active' in request.form:
         Participant.query.update({Participant.active: False})  # Setze alle auf inaktiv
@@ -126,8 +174,16 @@ def update_atimes(id):
         participant.time3 = request.form.get('time3', type=float)
         participant.time4 = request.form.get('time4', type=float)
         participant.time5 = request.form.get('time5', type=float)
+        participant.time6 = request.form.get('time6', type=float)
+        
+        participant.round1_passed = 'round1_passed' in request.form
+        participant.round2_passed = 'round2_passed' in request.form
+        participant.round3_passed = 'round3_passed' in request.form
+        participant.round4_passed = 'round4_passed' in request.form
+        participant.round5_passed = 'round5_passed' in request.form
+
         db.session.commit()
-        flash('Times updated successfully!', 'success')
+        flash('Times and round statuses updated successfully!', 'success')
     
     if 'set_active' in request.form:
         Participant.query.update({Participant.active: False})  # Setze alle auf inaktiv
@@ -136,6 +192,31 @@ def update_atimes(id):
         flash('Active participant set successfully!', 'success')
 
     return redirect(url_for('main.index'))
+
+@bp.route('/finish_round/<int:round_number>', methods=['POST'])
+@login_required
+def finish_round(round_number):
+    participants = Participant.query.all()
+    
+    for participant in participants:
+        if round_number == 1:
+            participant.round1_passed = f'round1_passed_{participant.id}' in request.form
+        elif round_number == 2:
+            participant.round2_passed = f'round2_passed_{participant.id}' in request.form
+        elif round_number == 3:
+            participant.round3_passed = f'round3_passed_{participant.id}' in request.form
+        elif round_number == 4:
+            participant.round4_passed = f'round4_passed_{participant.id}' in request.form
+        elif round_number == 5:
+            participant.round5_passed = f'round5_passed_{participant.id}' in request.form
+
+    db.session.commit()
+    flash(f'Round {round_number} finished successfully!', 'success')
+    
+    # Increase the round_number after finishing the current round
+    next_round = round_number + 1
+    
+    return redirect(url_for('main.index', current_round=next_round))
 
 @bp.route('/ranking')
 @login_required
