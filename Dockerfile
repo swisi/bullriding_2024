@@ -22,11 +22,11 @@ ENV FLASK_ENV=production
 EXPOSE 5000
 
 # Kopiere entrypoint.sh und setze Ausführungsrechte
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Festlegen des Entrypoints
-ENTRYPOINT ["sh", "/entrypoint.sh"]
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
 # Starten Sie die Flask-Anwendung
 CMD ["flask", "run", "--host=0.0.0.0"]
