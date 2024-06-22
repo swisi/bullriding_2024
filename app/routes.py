@@ -237,9 +237,38 @@ def set_active(id):
     flash('Active participant set successfully!', 'success')
     return redirect(url_for('main.index'))
 
+@bp.route('/reset_results', methods=['POST'])
+@login_required
+def reset_fields():
+    participants = Participant.query.all()
+    for participant in participants:
+        participant.time1 = None
+        participant.time2 = None
+        participant.time3 = None
+        participant.time4 = None
+        participant.time5 = None
+        participant.time6 = None
+        participant.round1_passed = None
+        participant.round2_passed = None
+        participant.round3_passed = None
+        participant.round4_passed = None
+        participant.round5_passed = None
+    db.session.commit()
+    flash('All fields have been reset to NULL.', 'success')
+    return redirect(url_for('main.index'))
+
+
 @bp.route('/ranking')
 @login_required
 def ranking():
     participants = Participant.query.all() if current_user.is_authenticated else []
-    rankings = sorted(participants, key=lambda p: p.longest_time if p.longest_time is not None else 0, reverse=True)
+    rankings = sorted(participants, key=lambda p: (
+        p.time6 if p.time6 is not None else float('-inf'),
+        p.time5 if p.time5 is not None else float('-inf'),
+        p.time4 if p.time4 is not None else float('-inf'),
+        p.time3 if p.time3 is not None else float('-inf'),
+        p.time2 if p.time2 is not None else float('-inf'),
+        p.time1 if p.time1 is not None else float('-inf')
+    ), reverse=True)
+
     return render_template('ranking.html', title='Rangliste', rankings=rankings)
