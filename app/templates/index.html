@@ -8,7 +8,7 @@
       <thead>
         <tr>
           <th>Aktiv</th>
-          <th onclick="sortTable(1)">Start Nr.</th>
+          <th onclick="sortTable(1, true)">Start Nr.</th>
           <th onclick="sortTable(2)">Vorname</th>
           <th onclick="sortTable(3)">Name</th>
           <th onclick="sortTable(4)">Runde 1</th>
@@ -33,7 +33,6 @@
             <th onclick="sortTable(14)">Runde 6</th>
             <th onclick="sortTable(15)">OK</th>
           {% endif %}
-          <th onclick="sortTable(16)">Längste Runde</th>
           <th></th>
           <th></th>
         </tr>
@@ -97,7 +96,6 @@
                 <input type="checkbox" name="round6_passed_{{ participant.id }}" {% if participant.round6_passed %}checked{% endif %} onclick="submitCheckbox(this)" {% if not participant.round5_passed %}disabled{% endif %}>
               </td>
             {% endif %}
-            <td>{{ participant.longest_time }}</td>
             <td></td>
             <td></td>
           </tr>
@@ -179,30 +177,27 @@
     }
 
     // Function to sort the table
-    function sortTable(n) {
+    function sortTable(n, isNumeric = false) {
       const table = document.getElementById("participantsTable");
       let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
       switching = true;
-      // Set the sorting direction to ascending:
       dir = "asc"; 
-      // Make a loop that will continue until no switching has been done:
       while (switching) {
         switching = false;
         rows = table.rows;
-        // Loop through all table rows (except the first, which contains table headers):
         for (i = 1; i < (rows.length - 1); i++) {
           shouldSwitch = false;
-          // Get the two elements you want to compare, one from current row and one from the next:
           x = rows[i].getElementsByTagName("TD")[n];
           y = rows[i + 1].getElementsByTagName("TD")[n];
-          // Check if the two rows should switch place, based on the direction, asc or desc:
+          let xValue = isNumeric ? parseInt(x.innerHTML) : x.innerHTML.toLowerCase();
+          let yValue = isNumeric ? parseInt(y.innerHTML) : y.innerHTML.toLowerCase();
           if (dir == "asc") {
-            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            if (xValue > yValue) {
               shouldSwitch = true;
               break;
             }
           } else if (dir == "desc") {
-            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            if (xValue < yValue) {
               shouldSwitch = true;
               break;
             }
