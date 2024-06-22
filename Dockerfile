@@ -26,7 +26,7 @@ COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # Festlegen des Entrypoints
-ENTRYPOINT ["sh", "/app/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Starten Sie die Flask-Anwendung
 CMD ["flask", "run", "--host=0.0.0.0"]
