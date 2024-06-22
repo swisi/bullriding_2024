@@ -22,8 +22,8 @@ ENV FLASK_ENV=production
 EXPOSE 5000
 
 # Kopiere entrypoint.sh und setze Ausführungsrechte
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Festlegen des Entrypoints
 ENTRYPOINT ["sh", "/entrypoint.sh"]
