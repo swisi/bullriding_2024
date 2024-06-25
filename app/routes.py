@@ -24,7 +24,7 @@ def index():
         return render_template('participant.html', title='Teilnehmer hinzufügen', form=form)
 
     if not current_user.is_authenticated:
-        return render_template('ranking.html', title='Rangliste', rankings=rankings)
+        return render_template('ranking.html', title='Rangliste', rankings=participants)
 
        
     return render_template(
