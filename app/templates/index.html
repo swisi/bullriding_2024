@@ -3,21 +3,19 @@
 
   <h2>Teilnehmer</h2>
   <form method="POST" action="{{ url_for('main.update_times_bulk') }}" class="update-form">
+    <button type="button" onclick="resetSorting()" class="btn btn-primary">Sortierung zurücksetzen</button>
     <table class="table table-striped table-sm" id="participantsTable">
       <thead>
         <tr>
           <th>Aktiv</th>
-          <th onclick="sortTable(1, true)">Start Nr.</th>
+          <th onclick="sortTable(1, true)">Nr.</th>
           <th onclick="sortTable(2)">Vorname</th>
           <th onclick="sortTable(3)">Name</th>
           <th onclick="sortTable(4)">VR 1</th>
-          <th onclick="sortTable(5)">OK</th>
           <th onclick="sortTable(5)">Q</th>
           <th onclick="sortTable(6)">VR 2</th>
-          <th onclick="sortTable(7)">OK</th>
           <th onclick="sortTable(5)">Q</th>
           <th onclick="sortTable(8)">VR 3</th>
-          <th onclick="sortTable(7)">OK</th>
           <th onclick="sortTable(5)">Q</th>
           <th onclick="sortTable(9)">Top VR</th>
           <th onclick="sortTable(11)">ZR 1</th>
@@ -32,7 +30,7 @@
           <tr class="{% if participant.active %}table-success{% endif %}">
             <td>
               <form method="POST" action="{{ url_for('main.set_active', id=participant.id) }}">
-                <button type="submit" class="btn btn-primary btn-sm">
+                <button type="submit" class="btn btn-secondary btn-sm">
                   <i class="fas fa-play-circle"></i>
                 </button>
               </form>
@@ -43,41 +41,35 @@
             <td>
               <input type="text" name="time1_{{ participant.id }}" value="{{ participant.time1 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)">
             </td>
-            <td>
-              <input type="checkbox" name="round1_passed_{{ participant.id }}" {% if participant.round1_passed %}checked{% endif %} onclick="submitCheckbox(this)">
-            </td>
+
             <td>
               {% if participant.round1_qualified %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="far fa-circle"></i>{% endif %}
             </td>
             <td>
-              <input type="text" name="time2_{{ participant.id }}" value="{{ participant.time2 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.round1_passed %}disabled{% endif %}>
+              <input type="text" name="time2_{{ participant.id }}" value="{{ participant.time2 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if  participant.round1_qualified %}disabled{% endif %}>
             </td>
-            <td>
-              <input type="checkbox" name="round2_passed_{{ participant.id }}" {% if participant.round2_passed %}checked{% endif %} onclick="submitCheckbox(this)" {% if not participant.round1_passed %}disabled{% endif %}>
-            </td>
+
             <td>
               {% if participant.round2_qualified %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="far fa-circle"></i>{% endif %}
             </td>
             <td>
-              <input type="text" name="time3_{{ participant.id }}" value="{{ participant.time3 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.round2_passed %}disabled{% endif %}>
+              <input type="text" name="time3_{{ participant.id }}" value="{{ participant.time3 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if participant.round2_qualified %}disabled{% endif %}>
             </td>
-            <td>
-              <input type="checkbox" name="round3_passed_{{ participant.id }}" {% if participant.round3_passed %}checked{% endif %} onclick="submitCheckbox(this)" {% if not participant.round2_passed %}disabled{% endif %}>
-            </td>
+
             <td>{% if participant.round3_qualified %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="far fa-circle"></i>{% endif %}
             </td>
             <td>{{ participant.toptime_Vorrunde }}</td>
             <td>
-              <input type="text" name="time4_{{ participant.id }}" value="{{ participant.time4 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.round3_passed %}disabled{% endif %}>
+              <input type="text" name="time4_{{ participant.id }}" value="{{ participant.time4 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.round3_qualified %}disabled{% endif %}>
             </td>
             <td>
-              <input type="text" name="time5_{{ participant.id }}" value="{{ participant.time5 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.round4_passed %}disabled{% endif %}>
+              <input type="text" name="time5_{{ participant.id }}" value="{{ participant.time5 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.round3_qualified %}disabled{% endif %}>
             </td>
             <td>{{ participant.toptime_Zwischenrunde }}</td>
-            <td>{% if participant.round_zr_qualified %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="far fa-circle"></i>{% endif %}
+            <td>{% if participant.zwischenrunde_qualified %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="far fa-circle"></i>{% endif %}
             </td>
             <td>
-              <input type="text" name="time6_{{ participant.id }}" value="{{ participant.time6 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.round5_passed %}disabled{% endif %}>
+              <input type="text" name="time6_{{ participant.id }}" value="{{ participant.time6 or '' }}" class="form-control form-control-sm" onkeydown="submitAndFocusNext(event, this)" {% if not participant.zwischenrunde_qualified %}disabled{% endif %}>
             </td>
           </tr>
         {% endfor %}
@@ -85,32 +77,35 @@
       <tfoot>
         <tr>
           <td colspan="4"></td>
-          <td colspan="2">
+          <td colspan="1">
             <form method="POST" action="{{ url_for('main.finish_round', round='VR1') }}">
               <button type="submit" class="btn btn-primary btn-block">Abschliessend VR1</button>
             </form>
           </td>
-          <td colspan="2">
+          <td></td>
+          <td colspan="1">
             <form method="POST" action="{{ url_for('main.finish_round', round='VR2') }}">
               <button type="submit" class="btn btn-primary btn-block">Abschliessend VR2</button>
             </form>
           </td>
-          <td colspan="2">
+          <td></td>
+
+          <td colspan="1">
             <form method="POST" action="{{ url_for('main.finish_round', round='VR3') }}">
               <button type="submit" class="btn btn-primary btn-block">Abschliessend VR3</button>
             </form>
           </td>
+          <td></td>
+          <td></td>
           <td colspan="2">
-            <form method="POST" action="{{ url_for('main.finish_round', round='ZR1') }}">
-              <button type="submit" class="btn btn-primary btn-block">Abschliessend ZR1</button>
+            <form method="POST" action="{{ url_for('main.finish_round', round='ZR') }}">
+              <button type="submit" class="btn btn-primary btn-block">Abschliessend ZR</button>
             </form>
           </td>
-          <td colspan="2">
-            <form method="POST" action="{{ url_for('main.finish_round', round='ZR2') }}">
-              <button type="submit" class="btn btn-primary btn-block">Abschliessend ZR2</button>
-            </form>
-          </td>
-          <td colspan="2">
+          <td></td>
+          <td></td>
+
+          <td colspan="3">
             <form method="POST" action="{{ url_for('main.finish_round', round='FINAL') }}">
               <button type="submit" class="btn btn-primary btn-block">Abschliessend FINAL</button>
             </form>
@@ -119,7 +114,7 @@
         </tr>
       </tfoot>
     </table>
-    <button type="button" onclick="resetSorting()" class="btn btn-secondary">Sortierung zurücksetzen</button>
+    <button type="button" onclick="resetSorting()" class="btn btn-primary">Sortierung zurücksetzen</button>
   </form>
 
   <script>
