@@ -11,18 +11,18 @@
           <th onclick="sortTable(1, true)">Nr.</th>
           <th onclick="sortTable(2)">Vorname</th>
           <th onclick="sortTable(3)">Name</th>
-          <th onclick="sortTable(4)">VR 1</th>
-          <th onclick="sortTable(5)">Q</th>
-          <th onclick="sortTable(6)">VR 2</th>
-          <th onclick="sortTable(5)">Q</th>
-          <th onclick="sortTable(8)">VR 3</th>
-          <th onclick="sortTable(5)">Q</th>
-          <th onclick="sortTable(9)">Top VR</th>
-          <th onclick="sortTable(11)">ZR 1</th>
-          <th onclick="sortTable(13)">ZR 2</th>
-          <th onclick="sortTable(14)">Top ZR</th>
-          <th onclick="sortTable(5)">Q</th>
-          <th onclick="sortTable(16)">Final</th>
+          <th class="col-time">VR 1</th>
+          <th class="col-qual">Q</th>
+          <th class="col-time">VR 2</th>
+          <th class="col-qual">Q</th>
+          <th class="col-time">VR 3</th>
+          <th class="col-qual">Q</th>
+          <th class="col-time">Top VR</th>
+          <th class="col-time">ZR 1</th>
+          <th class="col-time">ZR 2</th>
+          <th class="col-time">Top ZR</th>
+          <th class="col-qual">Q</th>
+          <th class="col-time">Final</th>
         </tr>
       </thead>
       <tbody>
@@ -116,6 +116,15 @@
     </table>
     <button type="button" onclick="resetSorting()" class="btn btn-primary">Sortierung zurücksetzen</button>
   </form>
+
+  <style>
+    .col-time {
+      width: 100px;
+    }
+    .col-qual {
+      width: 50px;
+    }
+  </style>
 
   <script>
     // Function to submit and focus the next field in the column
