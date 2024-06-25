@@ -118,13 +118,28 @@
   </form>
 
   <script>
-    // Function to submit and focus the next field
+    // Function to submit and focus the next field in the column
     function submitAndFocusNext(event, currentField) {
       if (event.key === 'Enter') {
         event.preventDefault();
+
         let form = currentField.closest("form");
         let inputs = Array.from(document.querySelectorAll('input[type="text"]'));
         let currentIndex = inputs.indexOf(currentField);
+
+        // Get the current field position
+        let currentColumnIndex = Array.from(currentField.closest('tr').children).indexOf(currentField.closest('td'));
+        let nextRowField = null;
+
+        // Find the next field in the same column
+        for (let i = currentIndex + 1; i < inputs.length; i++) {
+          let field = inputs[i];
+          let fieldColumnIndex = Array.from(field.closest('tr').children).indexOf(field.closest('td'));
+          if (fieldColumnIndex === currentColumnIndex) {
+            nextRowField = field;
+            break;
+          }
+        }
 
         // Append hidden input to identify this submit action
         let hiddenInput = document.createElement('input');
@@ -140,8 +155,8 @@
           body: formData,
         }).then(response => {
           if (response.ok) {
-            if (currentIndex > -1 && currentIndex < inputs.length - 1) {
-              inputs[currentIndex + 1].focus();
+            if (nextRowField) {
+              nextRowField.focus();
             }
           } else {
             console.error('Form submission failed');
@@ -150,42 +165,6 @@
           console.error('Form submission error:', error);
         });
       }
-    }
-
-    // Function to handle checkbox submission
-    function submitCheckbox(checkbox) {
-      console.log('Checkbox clicked:', checkbox.name, checkbox.checked); // Debugging
-
-      let form = checkbox.closest("form");
-
-      if (form === null) {
-        console.error('Form not found for the checkbox:', checkbox);
-        return;
-      }
-
-      // Append hidden input to identify this submit action
-      let hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = 'update_times';
-      hiddenInput.value = 'true';
-      form.appendChild(hiddenInput);
-
-      // Submit the form
-      let formData = new FormData(form);
-      console.log('Form data being sent:', ...formData.entries()); // Debugging
-
-      fetch(form.action, {
-        method: "POST",
-        body: formData,
-      }).then(response => {
-        if (!response.ok) {
-          console.error('Checkbox submission failed');
-        } else {
-          console.log('Checkbox submission succeeded');
-        }
-      }).catch(error => {
-        console.error('Checkbox submission error:', error);
-      });
     }
 
     // Function to sort the table
